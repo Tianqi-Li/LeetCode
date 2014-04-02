@@ -1,0 +1,39 @@
+//[LeetCode] Minimum Window Substring
+//Given a string S and a string T, find the minimum window in S which //will contain all the characters in T in complexity O(n). 
+public class Solution {
+    public String minWindow(String S, String T) {
+        if(S==null || T==null) return null;
+        int[] dist = new int[256];
+        int[] record = new int[256];
+        // keep character and its time of appearence in T
+        for(int i=0; i<T.length(); i++) {
+            dist[T.charAt(i)]++;
+        }
+        int start=0, end=0, minStart=0, appear=0;
+        int min = Integer.MAX_VALUE;
+        for(end=0; end<S.length(); end++) {
+            // find one in T
+            if(dist[S.charAt(end)]>0) {
+                record[S.charAt(end)]++;
+                // if the character is valid, valid length increase
+                if(record[S.charAt(end)]<=dist[S.charAt(end)]) appear++;
+            }
+            // meet a valid substring
+            if(appear==T.length()) {
+                // find the minStart to short the substring
+                while(dist[S.charAt(start)]==0 || record[S.charAt(start)]>dist[S.charAt(start)]) {
+                    record[S.charAt(start)]--;
+                    start++;
+                }
+                // update the minStart and minimum length
+                if(end-start+1<min) {
+                    min = end-start+1;
+                    minStart = start;
+                }
+            }
+        }
+        
+        if(min==Integer.MAX_VALUE) return "";
+        else return S.substring(minStart,minStart+min);
+    }
+}
