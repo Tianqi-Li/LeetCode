@@ -1,0 +1,50 @@
+// DFS
+public class Solution {
+    public boolean exist(char[][] board, String word) {
+        if(word==null || word.length()==0) return false;
+        for(int i=0; i<board.length; i++) {
+            for(int j=0; j<board[0].length; j++) {
+                if(dfs(board, word, 0, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public boolean dfs(char[][] board, String word, int index, int x, int y) {
+        // find one path
+        if(index==word.length()-1 && word.charAt(index)==board[x][y]) {
+            return true;
+        }
+        // current character does not match
+        if(word.charAt(index) != board[x][y]) {
+            return false;
+        }
+        // keep the original value and label it as visited
+        char temp = board[x][y];
+        board[x][y] = '.';
+        // check four directions
+        boolean up=false, left=false, down=false, right=false;
+        // check up
+        if(x>0 && board[x-1][y]!='.') {
+            up = dfs(board, word, index+1, x-1, y);
+        }
+        // if up is false then check left
+        if(!up && y>0 && board[x][y-1]!='.') {
+            left = dfs(board, word, index+1, x, y-1);
+        }
+        // if up and left are false then check down
+        if(!up && !left && x<board.length-1 && board[x+1][y]!='.') {
+            down = dfs(board, word, index+1, x+1, y);
+        }
+        // if up and left and down are false then check right
+        if(!up && !left && !down && y<board[0].length-1 && board[x][y+1]!='.') {
+            right = dfs(board, word, index+1, x, y+1);
+        }
+        // recover the original value
+        board[x][y] = temp;
+        return up || left || down || right;
+        
+    }
+}
