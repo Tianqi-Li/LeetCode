@@ -1,0 +1,52 @@
+//#1 Linked list, each element appear only once
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null) return null;
+        ListNode p = head;
+        while(p!=null && p.next!=null) {
+            if(p.val==p.next.val) {
+                p.next = p.next.next;
+            } else p = p.next;
+        }
+        return head;
+    }
+}
+
+//#2 Linked list, remove all the duplicated elements
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode fakeHead = new ListNode(0);
+        fakeHead.next = head;
+        ListNode n1 = fakeHead;
+        while(n1.next!=null) {
+            ListNode n2 = n1.next;
+            while(n2.next!=null && n2.val==n2.next.val) n2 = n2.next;
+            if(n2==n1.next) n1 = n1.next;
+            else n1.next = n2.next;
+        }
+        return fakeHead.next;
+    }
+}
+
+//#3 Sorted array, same element can appear no more than twice
+// Use two pointers. The space between two pointers is used to hold the duplicate numbers
+// Time complexity O(n), space complexity O(1)
+public class Solution {
+    public int removeDuplicates(int[] A) {
+        if(A.length<=2) return A.length;
+        int last = 1, start = 2;
+        while(start<A.length) {
+            if(A[start]==A[last] && A[start]==A[last-1]) start++;
+            else {
+                // swap A[start] with A[last+1]
+                int temp = A[start];
+                A[start] = A[last+1];
+                A[last+1] = temp;
+                last++;
+                start++;
+            }
+        }
+        return last+1;
+    }
+}
