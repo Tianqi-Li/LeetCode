@@ -1,0 +1,172 @@
+//[LeetCode]DFS related problems Part I
+//#1 Subsets and Subsets II
+	public ArrayList<ArrayList<Integer>> subsets(int[] S) {
+		ArrayList<ArrayList<Integer>> res = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		res.add(list);
+		Arrays.sort(S);
+		addSubset(res, list, S, 0);
+		return res;
+	}
+	
+	public void addSubset(ArrayList<ArrayList<Integer>> res,ArrayList<Integer> list,int[] S, int start) {
+		for(int i=start; i<S.length; i++) {
+			// if there is duplicates in the original set, add the following code:
+			//if(i>start && S[i]==S[i-1]) continue; // remove duplicates
+			list.add(S[i]);
+			res.add(new ArrayList<Integer>(list));
+			addSubset(res, list, S, i+1);
+			list.remove(list.size()-1);
+		}
+	}
+
+
+//#2 Permutation and Permutation II
+	public ArrayList<ArrayList<Integer>> permute(int[] num) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        Arrays.sort(num);
+        boolean[] flag = new boolean[num.length];
+        dfs(res, list, num, flag);
+        return res;
+        
+    }
+    
+    public void dfs(ArrayList<ArrayList<Integer>> res, ArrayList<Integer> list, int[] num, boolean[] flag) {
+        if(list.size()==num.length) {
+            res.add(new ArrayList<Integer>(list));
+            return;
+        }
+        for(int i=0; i<num.length; i++) {
+        	// if there is duplicates in the original set, add the following code:
+			//if(i>0 && num[i]==num[i-1] && flag[i-1]==false) continue; // remove duplicates
+            if(flag[i]==false) {
+                list.add(num[i]);
+                flag[i] = true;
+                dfs(res, list, num, flag);
+                list.remove(list.size()-1);
+                flag[i] = false;
+            }
+        }
+    }
+
+
+
+//#3 Combination Sum and Combination Sum II
+	public ArrayList<ArrayList<Integer>> combinationSum(int[] candidates, int target) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        Arrays.sort(candidates);
+        dfs(res, list, candidates, target, 0);
+        return res;
+    }
+    
+    public void dfs(ArrayList<ArrayList<Integer>> res, ArrayList<Integer> list, int[] candidates, int target, int start) {
+        if(target<0) return;
+        if(target==0) {
+            res.add(new ArrayList<Integer>(list));
+            return;
+        }
+        for(int i=start; i<candidates.length; i++) {
+        	//To avoid duplicates
+        	//if(i>start && candidates[i]==candidates[i-1]) continue; 
+            list.add(candidates[i]);
+            // start index is i+1 for Combination Sum II
+            dfs(res, list, candidates, target-candidates[i], i); 
+            list.remove(list.size()-1);
+        }
+    }
+
+
+
+//#4 Generate Parentheses
+	public ArrayList<String> generateParenthesis(int n) {
+        ArrayList<String> res = new ArrayList<String>();
+        dfs(res, "", n, n);
+        return res;
+    }
+    
+    public void dfs(ArrayList<String> res, String tmp, int left, int right) {
+        if(left==0 && right==0) {
+            res.add(tmp);
+            return;
+        }
+        if(left>0) dfs(res, tmp+"(", left-1, right);
+        if(right>left) dfs(res, tmp+")", left, right-1);
+    }
+
+
+
+//#5 Letter Combinations of a Phone Number
+    public ArrayList<String> letterCombinations(String digits) {
+        ArrayList<String> res = new ArrayList<String>();
+        String[] dict = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        dfs(res, "", digits, dict);
+        return res;
+    }
+    
+    public void dfs(ArrayList<String> res, String tmp, String digits, String[] dict) {
+        if(digits.length()==0) {
+            res.add(tmp);
+            return;
+        }
+        String letters = dict[digits.charAt(0)-'0'];
+        for(int i=0; i<letters.length(); i++) {
+            dfs(res, tmp+letters.charAt(i), digits.substring(1), dict);
+        }
+    }
+
+
+
+//#6 Restore IP Addresses
+	public ArrayList<String> restoreIpAddresses(String s) {
+        ArrayList<String> res = new ArrayList<String>();
+        if(s.length()<4 || s.length()>12) return res;
+        dfs(res, "", s, 1);
+        return res;
+    }
+    
+    public void dfs(ArrayList<String> res, String tmp, String s, int count) {
+        if(count==4 && isValid(s)) {
+            res.add(tmp+s);
+            return;
+        }
+        for(int i=1; i<4 && i<s.length(); i++) {
+            if(isValid(s.substring(0,i))) dfs(res, tmp+s.substring(0,i)+".", s.substring(i), count+1);
+        }
+    }
+    
+    public boolean isValid(String s) {
+        if(s.charAt(0)=='0') return s.equals("0");
+        int val = Integer.parseInt(s);
+        return val>0 && val<=255;
+    }
+
+
+
+//#7 Palindrome Partitioning
+    public ArrayList<ArrayList<String>> partition(String s) {
+        ArrayList<ArrayList<String>> res = new ArrayList<ArrayList<String>>();
+        ArrayList<String> list = new ArrayList<String>();
+        dfs(res, list, s);
+        return res;
+    }
+    
+    public void dfs(ArrayList<ArrayList<String>> res, ArrayList<String> list, String s) {
+        if(s.length()==0) {
+            res.add(new ArrayList<String>(list));
+            return;
+        }
+        for(int i=1; i<=s.length(); i++) {
+            if(isPalindrome(s.substring(0,i))) {
+                list.add(s.substring(0,i));
+                dfs(res, list, s.substring(i));
+                list.remove(list.size()-1);
+            }
+        }
+    }
+    
+    public boolean isPalindrome(String s) {
+        StringBuilder sb = new StringBuilder(s);
+        return s.equals(sb.reverse().toString());
+    }
