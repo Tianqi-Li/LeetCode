@@ -1,0 +1,178 @@
+//[LeetCode]DP Summary PartII(2D)
+//#1 Interleaving String
+//Time and space complexity O(mn)
+public class Solution {
+    public boolean isInterleave(String s1, String s2, String s3) {
+        if(s1==null || s2==null || s3==null)  return false;
+        if(s1.length()+s2.length()!=s3.length()) return false;
+        boolean[][] dp = new boolean[s1.length()+1][s2.length()+1];
+        dp[0][0] = true;
+        for(int i=1; i<=s1.length(); i++) {
+            if(s1.charAt(i-1)==s3.charAt(i-1) && dp[i-1][0]) {
+                dp[i][0] = true;
+            }
+        }
+        for(int i=1; i<=s2.length(); i++) {
+            if(s2.charAt(i-1)==s3.charAt(i-1) && dp[0][i-1]) {
+                dp[0][i] = true;
+            }
+        }
+        for(int i=1; i<=s1.length(); i++) {
+            for(int j=1; j<=s2.length(); j++) {
+                //use s1.charAt(i-1)
+                if(s1.charAt(i-1)==s3.charAt(i+j-1) && dp[i-1][j]) {
+                    dp[i][j] = true;
+                }
+                //use s2.charAt(j-1)
+                if(s2.charAt(j-1)==s3.charAt(i+j-1) && dp[i][j-1]) {
+                    dp[i][j] = true;
+                }
+            }
+        }
+        return dp[s1.length()][s2.length()];
+    }
+}
+
+
+
+//#2 Edit Distance
+//Time and space complexity O(mn)
+public class Solution {
+    public int minDistance(String word1, String word2) {
+        int[][] dp = new int[word1.length()+1][word2.length()+1];
+        for(int i=1; i<=word1.length(); i++) {
+            dp[i][0] = dp[i-1][0]+1;
+        }
+        for(int i=1; i<=word2.length(); i++) {
+            dp[0][i] = dp[0][i-1]+1;
+        }
+        for(int i=1; i<=word1.length(); i++) {
+            for(int j=1; j<=word2.length(); j++) {
+                //no change
+                if(word1.charAt(i-1)==word2.charAt(j-1)) dp[i][j] = dp[i-1][j-1];
+                else {
+                    //replace, delete or add
+                    dp[i][j] = 1 + Math.min(dp[i-1][j-1], Math.min(dp[i-1][j], dp[i][j-1]));
+                }
+            }
+        }
+        return dp[word1.length()][word2.length()];
+    }
+}
+
+
+
+//#3 Palindrome Partitioning
+//DFS algorithm
+//Use 2D DP(dp[i][j]) to check whether s.substring(i,j+1) is palindrome
+public class Solution {
+    public ArrayList<ArrayList<String>> partition(String s) {
+        ArrayList<ArrayList<String>> res = new ArrayList<ArrayList<String>>();
+        if(s==null || s.length()==0) return res;
+        ArrayList<String> tmp = new ArrayList<String>();
+        boolean[][] dp = createTable(s);
+        dfs(res, tmp, s, 0, dp);
+        return res;
+    }
+    
+    public void dfs(ArrayList<ArrayList<String>> res, ArrayList<String> tmp, String s, int start, boolean[][] dp) {
+        if(start==s.length()) res.add(new ArrayList<String>(tmp));
+        else {
+            for(int i=start; i<s.length(); i++) {
+                if(dp[start][i]) {
+                    tmp.add(s.substring(start, i+1));
+                    dfs(res, tmp, s, i+1, dp);
+                    tmp.remove(tmp.size()-1);
+                }
+            }
+        }
+    }
+    public boolean[][] createTable(String s) {
+        int n = s.length();
+        boolean[][] dp = new boolean[n][n];
+        for(int i=0; i<n; i++) dp[i][i] = true;
+        for(int i=0; i<n; i++) {
+            //even case (abba)
+            int left = i-1;
+            int right = i;
+            while(left>=0 && right<n && s.charAt(left)==s.charAt(right)) {
+                dp[left--][right++] = true;
+            }
+            // odd case (aba)
+            left = i-1;
+            right = i+1;
+            while(left>=0 && right<n && s.charAt(left)==s.charAt(right)) {
+                dp[left--][right++] = true;
+            }
+        }
+        return dp;
+    }
+}
+
+
+
+//#4 Palindrome Partitioning II
+public class Solution {
+    public int minCut(String s) {
+        if(s==null || s.length()==0) return 0;
+        boolean[][] dp = createTable(s);
+        int[] cuts = new int[s.length()+1];
+        for(int i=s.length()-1; i>=0; i--) {
+            // maximum cuts from i to the end
+            cuts[i] = s.length()-i;
+            for(int j=i; j<s.length(); j++) {
+                if(dp[i][j]) {
+                    cuts[i] = Math.min(cuts[i], cuts[j+1]+1);
+                }
+            }
+        }
+        return cuts[0]-1;
+    }
+    
+    public boolean[][] createTable(String s) {
+        int n = s.length();
+        boolean[][] dp = new boolean[n][n];
+        for(int i=0; i<n; i++) dp[i][i] = true;
+        for(int i=0; i<n; i++) {
+            //even case (abba)
+            int left = i-1;
+            int right = i;
+            while(left>=0 && right<n && s.charAt(left)==s.charAt(right)) {
+                dp[left--][right++] = true;
+            }
+            // odd case (aba)
+            left = i-1;
+            right = i+1;
+            while(left>=0 && right<n && s.charAt(left)==s.charAt(right)) {
+                dp[left--][right++] = true;
+            }
+        }
+        return dp;
+    }
+}
+
+
+
+//#5 Distinct Subsequences 
+//Time and space complexity O(mn)
+public class Solution {
+    public int numDistinct(String S, String T) {
+        if(S==null || T==null) return 0;
+        int m =  T.length();
+        int n = S.length();
+        int[][] dp = new int[m+1][n+1];
+        dp[0][0] = 1;
+        for(int i=1; i<=n; i++) dp[0][i] = 1;
+        for(int i=1; i<=m; i++) dp[i][0] = 0;
+        for(int i=1; i<=m; i++) {
+            for(int j=1; j<=n; j++) {
+                if(T.charAt(i-1)==S.charAt(j-1)) {
+                    dp[i][j] = dp[i-1][j-1] + dp[i][j-1];
+                } else {
+                    dp[i][j] = dp[i][j-1];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
