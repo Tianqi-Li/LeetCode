@@ -1,0 +1,27 @@
+//[Leetcode]Evaluate Reverse Polish Notation
+public class Solution {
+    public int evalRPN(String[] tokens) {
+        Stack stack = new Stack();
+        for(int i=0; i<tokens.length; i++) {
+            String token = tokens[i];
+            if(!token.equals("+") && !token.equals("-") && !token.equals("*") && !token.equals("/")) {
+                stack.push(Integer.parseInt(token));
+            } else {
+                char c = token.charAt(0);
+                int a = (int)stack.pop();
+                int b = (int)stack.pop();
+                switch(c) {
+                    case '+': stack.push(a+b);
+                              break;
+                    case '-': stack.push(b-a);
+                              break;
+                    case '*': stack.push(a*b);
+                              break;
+                    case '/': stack.push(b/a);
+                              break;
+                }
+            }
+        }
+        return (int)stack.pop();
+    }
+}
