@@ -1,0 +1,28 @@
+//[Leetcode]Reverse Linked List II
+//One pass && In place
+public class Solution {
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        if(head==null || m==n) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode n1 = preHead;
+        ListNode n2 = preHead;
+        for(int i=0; i<n-m+2; i++) n2 = n2.next;
+        for(int i=0; i<m-1; i++) {
+            n1 = n1.next;
+            n2 = n2.next;
+        }
+        ListNode oldHead = n1.next;
+        ListNode start = n1.next;
+        ListNode p = n1.next.next;
+        while(p!=n2) {
+            ListNode tmp = p.next;
+            p.next = start;
+            start = p;
+            p = tmp;
+        }
+        n1.next = start;
+        oldHead.next = n2;
+        return preHead.next;
+    }
+}

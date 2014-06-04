@@ -1,0 +1,21 @@
+//[Leetcode]Rotate List
+public class Solution {
+    public ListNode rotateRight(ListNode head, int n) {
+        if(head==null || n==0) return head;
+        ListNode end = head;
+        int size = 1;
+        while(end.next!=null) {
+            end = end.next;
+            size++;
+        }
+        end.next = head;
+        int k = size-n%size;
+        while(k>0) {
+            end = end.next;
+            k--;
+        }
+        head = end.next;
+        end.next = null;
+        return head;
+    }
+}

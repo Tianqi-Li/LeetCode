@@ -1,0 +1,44 @@
+//[Leetcode]Remove Duplicates from Sorted List
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null) return null;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode p = head;
+        while(p!=null && p.next!=null) {
+            if(p.next.val != p.val) p = p.next;
+            else {
+                ListNode q = p.next;
+                while(q!=null && q.val==p.val) q = q.next;
+                p.next = q;
+                p = q;
+            }
+        }
+        return preHead.next;
+    }
+}
+
+
+//Remove Duplicates from Sorted List II
+//Leaving only distinct numbers
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode preHead = new ListNode(-1);
+        ListNode prev = preHead;
+        preHead.next = head;
+        ListNode p = head;
+        while(p!=null && p.next!=null) {
+            if(p.val==p.next.val) {
+                while(p.next!=null && p.val==p.next.val) p = p.next;
+                prev.next = p.next;
+                p = p.next;
+            }
+            else {
+                prev = p;
+                p = p.next;
+            }
+        }
+        return preHead.next;
+    }
+}

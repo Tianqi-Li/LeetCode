@@ -1,0 +1,30 @@
+//[Leetcode]Reverse Nodes in k-Group
+public class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if(head==null || k==1) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode pre = preHead;
+        int i=0;
+        while(head!=null) {
+            i++;
+            if(i%k==0) {
+                pre = reverse(pre,head.next);
+                head = pre.next;
+            } else head = head.next;
+        }
+        return preHead.next;
+    }
+    
+    public ListNode reverse(ListNode start, ListNode end) {
+        ListNode head = start.next;
+        ListNode p = head.next;
+        while(p!=end) {
+            head.next = p.next;
+            p.next = start.next;
+            start.next = p;
+            p = head.next;
+        }
+        return head;
+    }
+}
