@@ -1,0 +1,75 @@
+//[Leetcode]LRU Cache
+public class LRUCache {
+    private HashMap<Integer,DoubleLinkedListNode> map = new HashMap<Integer, DoubleLinkedListNode>();
+    private int capacity;
+    private int size;
+    private DoubleLinkedListNode head;
+    private DoubleLinkedListNode end;
+    
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        size = 0;
+    }
+    
+    public int get(int key) {
+        if(map.containsKey(key)) {
+            DoubleLinkedListNode node = map.get(key);
+            removeNode(node);
+            setHead(node);
+            return node.val;
+        } else {
+            return -1;
+        }
+    }
+    
+    public void set(int key, int value) {
+        if(map.containsKey(key)) {
+            DoubleLinkedListNode n = map.get(key);
+            n.val = value;
+            removeNode(n);
+            setHead(n);
+        } else {
+            DoubleLinkedListNode n = new DoubleLinkedListNode(key,value);
+            if(size<capacity) {
+                setHead(n);
+                map.put(key,n);
+                size++;
+            } else {
+                map.remove(end.key);
+                end = end.pre;
+                if(end!=null) end.next = null;
+                setHead(n);
+                map.put(key,n);
+            }
+        }
+    }
+    
+    public void removeNode(DoubleLinkedListNode n) {
+        DoubleLinkedListNode pre = n.pre;
+        DoubleLinkedListNode post = n.next;
+        if(pre==null) head = post;
+        else pre.next = post;
+        if(post==null) end = pre;
+        else post.pre = pre;
+    }
+    
+    public void setHead(DoubleLinkedListNode n) {
+        n.next = head;
+        n.pre = null;
+        if(head!=null) head.pre = n;
+        head = n;
+        if(end==null) end = n;
+    }
+}
+
+
+class DoubleLinkedListNode {
+    public int val;
+    public int key;
+    public DoubleLinkedListNode pre;
+    public DoubleLinkedListNode next;
+    public DoubleLinkedListNode(int key, int val) {
+        this.val = val;
+        this.key = key;
+    }
+}

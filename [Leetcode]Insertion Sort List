@@ -1,0 +1,23 @@
+//[Leetcode]Insertion Sort List
+public class Solution {
+    public ListNode insertionSortList(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode p = head;
+        while(p!=null && p.next!=null) {
+            if(p.val<p.next.val) {
+                p = p.next;
+            } else {
+                ListNode toInsert = p.next;
+                ListNode n = preHead;
+                while(n.next.val<toInsert.val) n = n.next;
+                ListNode tmp = n.next;
+                n.next = toInsert;
+                p.next = toInsert.next;
+                toInsert.next = tmp;
+            }
+        }
+        return preHead.next;
+    }
+}

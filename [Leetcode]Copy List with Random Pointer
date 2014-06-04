@@ -1,0 +1,71 @@
+//[Leetcode]Copy List with Random Pointer
+
+/**
+ * Definition for singly-linked list with a random pointer.
+ * class RandomListNode {
+ *     int label;
+ *     RandomListNode next, random;
+ *     RandomListNode(int x) { this.label = x; }
+ * };
+ */
+
+ //Copy node method
+public class Solution {
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if(head==null) return null;
+        RandomListNode p = head;
+        //Make a copy for each node
+        while(p!=null) {
+            RandomListNode copy = new RandomListNode(p.label);
+            copy.next = p.next;
+            p.next = copy;
+            p = copy.next;
+        }
+        //Copy the random pointer for each new node
+        p = head;
+        while(p!=null) {
+            if(p.random!=null) {
+                p.next.random = p.random.next;
+            }
+            p = p.next.next;
+        }
+        //Split the list into two parts
+        p = head;
+        RandomListNode newHead = p.next;
+        while(p!=null && p.next!=null) {
+            RandomListNode tmp = p.next;
+            p.next = tmp.next;
+            p = tmp;
+        }
+        return newHead;
+    }
+}
+
+//HashMap method
+public class Solution {
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if(head==null) return null;
+        HashMap<RandomListNode, RandomListNode> map = new HashMap<RandomListNode, RandomListNode>();
+        RandomListNode newHead = new RandomListNode(head.label);
+        map.put(head,newHead);
+        RandomListNode n1 = head.next;
+        RandomListNode n2 = newHead;
+        //Copy each node into hashmap
+        while(n1!=null) {
+            RandomListNode copy = new RandomListNode(n1.label);
+            map.put(n1,copy);
+            n2.next = copy;
+            n1 = n1.next;
+            n2 = copy;
+        }
+        n1 = head;
+        //Copy random pointer for each node
+        while(n1!=null) {
+            if(n1.random!=null) {
+                map.get(n1).random = map.get(n1.random);
+            }
+            n1 = n1.next;
+        }
+        return newHead;
+    }
+}

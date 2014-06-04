@@ -1,0 +1,38 @@
+//[Leetcode]Reorder List
+public class Solution {
+    public void reorderList(ListNode head) {
+        if(head==null || head.next==null || head.next.next==null) return;
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast.next!=null && fast.next.next!=null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode right = reverse(slow.next);
+        slow.next = null;
+        ListNode left = head;
+        while(right!=null) {
+            ListNode tmp1 = left.next;
+            ListNode tmp2 = right.next;
+            left.next = right;
+            right.next = tmp1;
+            left = tmp1;
+            right = tmp2;
+        }
+        if(left==slow) left.next = null;
+    }
+    
+    public ListNode reverse(ListNode head) {
+        if(head==null) return head;
+        ListNode start = head;
+        ListNode p = head.next;
+        while(p!=null) {
+            ListNode tmp =  p.next;
+            p.next = start;
+            start = p;
+            p = tmp;
+        }
+        head.next = null;
+        return start;
+    }
+}

@@ -1,0 +1,20 @@
+//[Leetcode]Flatten Binary Tree to Linked List
+//Use a stack to get the pre-order traversal for each node
+public class Solution {
+    public void flatten(TreeNode root) {
+        if(root==null) return;;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        stack.push(root);
+        TreeNode prev = null;
+        while(!stack.isEmpty()) {
+            TreeNode curr = stack.pop();
+            if(curr.right!=null) stack.push(curr.right);
+            if(curr.left!=null) stack.push(curr.left);
+            if(prev!=null) {
+                prev.right = curr;
+                prev.left = null;
+            }
+            prev = curr;
+        }
+    }
+}
