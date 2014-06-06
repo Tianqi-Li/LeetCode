@@ -1,0 +1,18 @@
+//[Leetcode]Sum Root to Leaf Numbers
+public class Solution {
+    int sum = 0;
+    public int sumNumbers(TreeNode root) {
+        if(root==null) return sum;
+        dfs(root, "");
+        return sum;
+    }
+    
+    public void dfs(TreeNode root, String tmp) {
+        if(root.left==null && root.right==null) {
+            sum += Integer.parseInt(tmp+root.val);
+            return;
+        }
+        if(root.left!=null) dfs(root.left, tmp+root.val);
+        if(root.right!=null) dfs(root.right, tmp+root.val);
+    }
+}

@@ -1,0 +1,18 @@
+//[Leetcode]Binary Tree Maximum Path Sum
+public class Solution {
+    int max = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        sumHelper(root);
+        return max;
+    }
+    
+    //sumHelper function returns the max path value start from root
+    public int sumHelper(TreeNode root) {
+        if(root==null) return 0;
+        int left = sumHelper(root.left);
+        int right = sumHelper(root.right);
+        int center = Math.max(root.val, Math.max(left + root.val, right + root.val));
+        max = Math.max(max, Math.max(center, left + root.val + right));
+        return center;
+    }
+}
