@@ -1,0 +1,78 @@
+//[Leetcode]DP Summary PartI
+#1 Decode Ways
+//DP using O(n) time and O(1) space
+public class Solution {
+    public int numDecodings(String s) {
+        if(s.length()==0) return 0;
+        if(s.charAt(0)=='0') return 0;
+        if(s.length()==1) return s.charAt(0)=='0'?0:1;
+        int n1=1, n2=1;
+        for(int i=1; i<s.length(); i++) {
+            int count = 0;
+            if(s.charAt(i)!='0') count += n2;
+            int v = Integer.parseInt(s.substring(i-1,i+1));
+            if(v>=10 && v<=26) count += n1;
+            n1 = n2;
+            n2 = count;
+        }
+        return n2;
+    }
+}
+
+
+#2 Best Time to Buy and Sell Stock I
+//O(n) time and O(1) space, keep track of the lowest price and max profit at the same time
+public class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length==0) return 0;
+        int lowest = prices[0];
+        int max = 0;
+        for(int i=0; i<prices.length; i++) {
+            max = Math.max(max, prices[i]-lowest);
+            if(prices[i]<lowest) lowest = prices[i];
+        }
+        return max;
+    }
+}
+
+
+#3 Best Time to Buy and Sell Stock II
+public class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length==0) return 0;
+        int buy = prices[0];
+        int profit = 0;
+        for(int i=1; i<prices.length; i++) {
+            if(prices[i]>buy) profit += prices[i]-buy;
+            buy = prices[i];
+        }
+        return profit;
+    }
+}
+
+
+#4 Best Time to Buy and Sell Stock III
+//O(n) time and O(n) space complexity. Two iterations
+public class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length==0) return 0;
+        //Use profit array to keep the max profit at time i(one transaction)
+        int[] profit = new int[prices.length];
+        int max = 0;
+        int lowest = prices[0];
+        for(int i=1; i<prices.length; i++) {
+            max = Math.max(max, prices[i]-lowest);
+            profit[i] = max;
+            if(prices[i]<lowest) lowest = prices[i];
+        }
+        int maxProfit = max;
+        int highest = prices[prices.length-1];
+        max = 0;
+        for(int i=prices.length-2; i>=0; i--) {
+            max = Math.max(max, highest-prices[i]);
+            maxProfit = Math.max(maxProfit, profit[i]+max);
+            if(prices[i]>highest) highest = prices[i];
+        }
+        return maxProfit;
+    }
+}
