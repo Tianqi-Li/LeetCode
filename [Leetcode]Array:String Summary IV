@@ -1,0 +1,248 @@
+//[Leetcode]Array/String Summary IV
+#1 Integer to Roman
+//Roman characters:
+//M-1000 D-500 C-100 L-50 X-10 V-5 I-1
+public class Solution {
+    public String intToRoman(int num) {
+        String[] symbol = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] value = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; num!=0; i++) {
+            while(num>=value[i]) {
+                sb.append(symbol[i]);
+                num -= value[i];
+            }
+        }
+        return sb.toString();
+    }
+}
+
+#2 Roman to Integer
+public class Solution {
+    public int romanToInt(String s) {
+        if(s.length()==0) return 0;
+        int res = 0;
+        HashMap<Character, Integer> map = new HashMap<Character, Integer>();
+        map.put('M', 1000);
+        map.put('D', 500);
+        map.put('C', 100);
+        map.put('L', 50);
+        map.put('X', 10);
+        map.put('V', 5);
+        map.put('I', 1);
+        for(int i=0; i<s.length(); i++) {
+            if(i==s.length()-1) res += map.get(s.charAt(i));
+            else {
+                //Greater than or equal to the next character, add in order
+                if(map.get(s.charAt(i)) >= map.get(s.charAt(i+1))) res += map.get(s.charAt(i));
+                else {
+                    res += (map.get(s.charAt(i+1))-map.get(s.charAt(i)));
+                    i++;
+                }
+            }
+        }
+        return res;
+    }
+}
+
+
+#3 Implement strStr()
+public class Solution {
+    public String strStr(String haystack, String needle) {
+        //brute-force algorithm
+        if(haystack==null || needle==null || haystack.length()<needle.length()) return null;
+        for(int i=0; i<=haystack.length()-needle.length(); i++) {
+            boolean flag = true;
+            for(int j=0; j<needle.length(); j++) {
+                if(haystack.charAt(i+j)!=needle.charAt(j)) {
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag) return haystack.substring(i);
+        }
+        return null;
+    }
+}
+
+
+#4 Substring with Concatenation of All Words
+public class Solution {
+    public List<Integer> findSubstring(String S, String[] L) {
+        List<Integer> list = new ArrayList<Integer>();
+        if(S.length()==0 || L.length==0) return list;
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        for(int i=0; i<L.length; i++) {
+            if(map.containsKey(L[i])) map.put(L[i], map.get(L[i])+1);
+            else map.put(L[i], 1);
+        }
+        int size = L[0].length();
+        int i=0;
+        while(i<=S.length()-size*L.length) {
+            if(!map.containsKey(S.substring(i, i+size))) i++;
+            else {
+                HashMap<String, Integer> tmp = new HashMap<String, Integer>(map);
+                boolean flag = true;
+                for(int j=i; j<=i+size*(L.length-1); j+=size) {
+                    String str = S.substring(j, j+size);
+                    if(tmp.containsKey(str) && tmp.get(str)>0) {
+                        tmp.put(str, tmp.get(str)-1);
+                    } else {
+                        flag = false;
+                        break;
+                    }
+                }
+                if(flag) list.add(i);
+                i++;
+            }
+        }
+        return list;
+    }
+}
+
+
+#5 Next Permutation
+public class Solution {
+    public void nextPermutation(int[] num) {
+        if(num.length==0) return;
+        int i=num.length-1;
+        while(i>0 && num[i]<=num[i-1]) i--;
+        if(i==0) reverseInPlace(num, 0);
+        else {
+            int j = num.length-1;
+            //Notice the equals
+            while(num[j]<=num[i-1]) j--;
+            int tmp = num[i-1];
+            num[i-1] = num[j];
+            num[j] = tmp;
+            reverseInPlace(num, i);
+        }
+    }
+    
+    public void reverseInPlace(int[] arr, int start) {
+        int end = arr.length-1;
+        while(start<end) {
+            int tmp = arr[start];
+            arr[start] = arr[end];
+            arr[end] = tmp;
+            start++;
+            end--;
+        }
+    }
+}
+
+
+#6 Count and Say
+public class Solution {
+    public String countAndSay(int n) {
+        if(n==0) return "";
+        String last = "1";
+        for(int i=2; i<=n; i++) {
+            StringBuilder sb = new StringBuilder();
+            int j=0;
+            while(j<last.length()) {
+                int count = 1;
+                int k = j+1;
+                while(k<last.length() && last.charAt(k)==last.charAt(k-1)) {
+                    k++;
+                    count++;
+                }
+                sb.append("" + count + last.charAt(j));
+                j = k;
+            }
+            last = sb.toString();
+        }
+        return last;
+    }
+}
+
+
+#7 Anagrams
+public class Solution {
+    public List<String> anagrams(String[] strs) {
+        List<String> res = new ArrayList<String>();
+        if(strs.length==0) return res;
+        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+        for(int i=0; i<strs.length; i++) {
+            char[] chars = strs[i].toCharArray();
+            Arrays.sort(chars);
+            String s = new String(chars);
+            if(map.containsKey(s)) map.get(s).add(strs[i]);
+            else {
+                List<String> list = new ArrayList<String>();
+                list.add(strs[i]);
+                map.put(s, list);
+            }
+        }
+        for(List<String> list: map.values()) {
+            if(list.size()>1) res.addAll(list);
+        }
+        return res;
+    }
+}
+
+
+#8 Maximum Subarray
+public class Solution {
+    public int maxSubArray(int[] A) {
+        int sum = A[0];
+        int max = A[0];
+        for(int i=1; i<A.length; i++) {
+            if(sum<0) sum = 0;
+            sum += A[i];
+            max = Math.max(max, sum);
+        }
+        return max;
+    }
+}
+
+
+#9 Insert Interval
+public class Solution {
+    public List<Interval> insert(List<Interval> intervals, Interval newInterval) {
+        List<Interval> list = new ArrayList<Interval>();
+        if(intervals.size()==0) {
+            list.add(newInterval);
+            return list;
+        }
+        for(int i=0; i<intervals.size(); i++) {
+            if(newInterval.end<intervals.get(i).start) {
+                list.add(newInterval);
+                newInterval = intervals.get(i);
+            } else if(newInterval.start>intervals.get(i).end) {
+                list.add(intervals.get(i));
+            } else {
+                Interval tmp = new Interval();
+                tmp.start = Math.min(intervals.get(i).start, newInterval.start);
+                tmp.end = Math.max(intervals.get(i).end, newInterval.end);
+                newInterval = tmp;
+            }
+        }
+        //Add the newInterval at last
+        list.add(newInterval);
+        return list;
+    }
+}
+
+
+#10 Merge Intervals
+public class Solution {
+    public List<Interval> merge(List<Interval> intervals) {
+        if(intervals.size()==0) return intervals;
+        Collections.sort(intervals, new Comparator<Interval>() {
+            public int compare(Interval i1, Interval i2) {
+                if(i1.start<i2.start) return -1;
+                else if(i1.start==i2.start) return 0;
+                else return 1;
+            }
+        });
+        List<Interval> res = new ArrayList<Interval>();
+        res.add(intervals.get(0));
+        for(int i=1; i<intervals.size(); i++) {
+            Interval last = res.get(res.size()-1);
+            if(intervals.get(i).start>last.end) res.add(intervals.get(i));
+            else last.end = Math.max(last.end, intervals.get(i).end);
+        }
+        return res;
+    }
+}
