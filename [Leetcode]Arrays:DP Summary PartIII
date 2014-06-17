@@ -1,0 +1,227 @@
+//[Leetcode]Arrays/DP Summary PartIII
+#1 Pascal's Triangle
+public class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        if(numRows==0) return res;
+        for(int i=0; i<numRows; i++) {
+            List<Integer> curr = new ArrayList<Integer>();
+            curr.add(1);
+            if(res.size()==0) res.add(curr);
+            else {
+                List<Integer> last = res.get(res.size()-1);
+                for(int j=0; j<last.size()-1; j++) curr.add(last.get(j)+last.get(j+1));
+                curr.add(1);
+                res.add(curr);
+            }
+        }
+        return res;
+    }
+}
+
+
+#2 Pascal's Triangle II
+//O(k) space
+public class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> list = new ArrayList<Integer>();
+        //rowIndex start from 0
+        for(int i=0; i<rowIndex+1; i++) {
+            if(i==0) list.add(1);
+            else {
+                int prev = 1;
+                for(int j=1; j<list.size(); j++) {
+                    int tmp = list.get(j);
+                    //If you want to update the value of element in the list, use list.set(index, value)
+                    list.set(j, tmp+prev);
+                    prev = tmp;
+                }
+                list.add(1);
+            }
+        }
+        return list;
+    }
+}
+
+
+#3 Triangle
+public class Solution {
+    public int minimumTotal(List<List<Integer>> triangle) {
+        List<Integer> dp = triangle.get(triangle.size()-1);
+        //From bottom to up
+        for(int i=triangle.size()-2; i>=0; i--) {
+            List<Integer> curr = triangle.get(i);
+            for(int j=0; j<curr.size(); j++) {
+                dp.set(j, Math.min(dp.get(j), dp.get(j+1))+curr.get(j));
+            }
+        }
+        return dp.get(0);
+    }
+}
+
+
+#4 Longest Substring Without Repeating Characters
+public class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s.length()==0) return 0;
+        int[] dict = new int[256];
+        int start = 0;
+        int max = 0;
+        int length = 0;
+        for(int i=0; i<s.length(); i++) {
+            if(dict[s.charAt(i)]==0) {
+                dict[s.charAt(i)]++;
+                length++;
+                max = Math.max(max, length);
+            } else {
+                int j=start;
+                while(s.charAt(j)!=s.charAt(i)) {
+                    dict[s.charAt(j)]--;
+                    j++;
+                }
+                start = j+1;
+                length = i-start+1;
+            }
+        }
+        return max;
+    }
+}
+
+
+#5 Longest Palindromic Substring
+public class Solution {
+    public String longestPalindrome(String s) {
+        if(s.length()==0) return "";
+        String res = "";
+        for(int i=0; i<s.length(); i++) {
+            String str = expand(s,i);
+            if(str.length()>res.length()) res = str;
+        }
+        return res;
+    }
+    
+    public String expand(String s, int center) {
+        String longest = s.substring(center, center);
+        //odd case
+        int start = center;
+        int end = center;
+        while(start>=0 && end<s.length() && s.charAt(start)==s.charAt(end)) {
+            start--;
+            end++;
+        }
+        if(end-start-1>longest.length()) longest = s.substring(start+1, end);
+        //even case
+        start = center;
+        end = center+1;
+        while(start>=0 && end<s.length() && s.charAt(start)==s.charAt(end)) {
+            start--;
+            end++;
+        }
+        if(end-start-1>longest.length()) longest = s.substring(start+1, end);
+        return longest;
+    }
+}
+
+
+#6 Palindrome Number
+public class Solution {
+    public boolean isPalindrome(int x) {
+        if(x<0) return false;
+        int div = 1;
+        while(x/div>=10) div*=10;
+        while(x>0) {
+            int n1 = x/div;
+            int n2 = x%10;
+            if(n1!=n2) return false;
+            x = x%div/10;
+            div = div/100;
+        }
+        return true;
+    }
+}
+
+
+#7 Longest Common Prefix
+public class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        if(strs.length==0) return "";
+        for(int i=0; i<strs[0].length(); i++) {
+            for(int j=1; j<strs.length; j++) {
+                if(i>=strs[j].length() || strs[0].charAt(i)!=strs[j].charAt(i)) {
+                    return strs[0].substring(0,i);
+                }
+            }
+        }
+        return strs[0];
+    }
+}
+
+
+#8 Valid Palindrome
+public class Solution {
+    public boolean isPalindrome(String s) {
+        if(s.length()==0) return true;
+        int start = 0;
+        int end = s.length()-1;
+        while(start<=end) {
+            char c1 = s.charAt(start);
+            char c2 = s.charAt(end);
+            //check if alphanumeric
+            if(!Character.isLetterOrDigit(c1)) start++;
+            else if(!Character.isLetterOrDigit(c2)) end--;
+            else {
+                if(Character.toLowerCase(c1)!=Character.toLowerCase(c2)) return false;
+                else {
+                    start++;
+                    end--;
+                }
+            }
+        }
+        return true;
+    }
+}
+
+
+#9 Longest Valid Parentheses
+//O(n) time and O(n) space
+public class Solution {
+    public int longestValidParentheses(String s) {
+        if(s.length()==0) return 0;
+        Stack<Integer> stack = new Stack<Integer>();
+        int last = -1;
+        int max = 0;
+        for(int i=0; i<s.length(); i++) {
+            if(s.charAt(i)=='(') stack.push(i);
+            else {
+                if(stack.isEmpty()) last = i;
+                else {
+                    stack.pop();
+                    if(stack.isEmpty()) max = Math.max(max, i-last);
+                    else max = Math.max(max, i-stack.peek());
+                }
+            }
+        }
+        return max;
+    }
+}
+
+
+#10 Valid Parentheses
+public class Solution {
+    public boolean isValid(String s) {
+        if(s.length()==0) return false;
+        HashMap<Character, Character> map = new HashMap<Character, Character>();
+        map.put(')', '(');
+        map.put(']', '[');
+        map.put('}', '{');
+        Stack<Character> stack = new Stack<Character>();
+        for(int i=0; i<s.length(); i++) {
+            if(map.containsKey(s.charAt(i))) {
+                if(stack.isEmpty()) return false;
+                else if(stack.peek()==map.get(s.charAt(i))) stack.pop();
+                else return false;
+            } else stack.push(s.charAt(i));
+        }
+        return stack.isEmpty();
+    }
+}
