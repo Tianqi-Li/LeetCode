@@ -1,0 +1,207 @@
+//[Leetcode]Binary Tree Summary PartI
+#1 Binary Tree Preorder Traversal
+public class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        if(root==null) return res;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        stack.push(root);
+        while(!stack.isEmpty()) {
+            TreeNode n = stack.pop();
+            res.add(n.val);
+            if(n.right!=null) stack.push(n.right);
+            if(n.left!=null) stack.push(n.left);
+        }
+        return res;
+    }
+}
+
+#2 Binary Tree Inorder Traversal
+public class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        if(root==null) return res;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        TreeNode p = root;
+        while(!stack.isEmpty() || p!=null) {
+            if(p!=null) {
+                stack.push(p);
+                p = p.left;
+            } else {
+                TreeNode n = stack.pop();
+                res.add(n.val);
+                p = n.right;
+            }
+        }
+        return res;
+    }
+}
+
+
+//Non-stack version
+public List<Integer> inorder(TreeNode root) {
+		List<Integer> res = new ArrayList<Integer>();
+		TreeNode curr = root;
+		while(curr!=null) {
+			if(curr.left==null) {
+				res.add(curr.val);
+				curr = curr.right;
+			} else {
+				TreeNode tmp = curr.left;
+				while(tmp.right!=null && tmp.right!=curr) tmp = tmp.right;
+				if(tmp.right==null) {
+					tmp.right = curr;
+					curr = curr.left;
+				} else {
+					tmp.right = null;
+					res.add(curr.val);
+					curr = curr.right;
+				}
+			}
+		}
+		return res;
+	}
+
+#3 Binary Tree Postorder Traversal
+public class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        if(root==null) return res;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        stack.push(root);
+        TreeNode prev = null;
+        while(!stack.isEmpty()) {
+            TreeNode curr = stack.peek();
+            if(prev==null || prev.left==curr || prev.right==curr) {
+                if(curr.left!=null) stack.push(curr.left);
+                else if(curr.right!=null) stack.push(curr.right);
+                else res.add(stack.pop().val);
+            } else if(curr.left==prev) {
+                if(curr.right!=null) stack.push(curr.right);
+                else res.add(stack.pop().val);
+            } else if(curr.right==prev) {
+                res.add(stack.pop().val);
+            }
+            prev = curr;
+        }
+        return res;
+    }
+}
+
+
+#4 Unique Binary Search Trees
+public class Solution {
+    public int numTrees(int n) {
+        return helper(1,n);
+    }
+    
+    public int helper(int start, int end) {
+        if(start>=end) return 1;
+        int count = 0;
+        for(int i=start; i<=end; i++) {
+            count += helper(start, i-1)*helper(i+1, end);
+        }
+        return count;
+    }
+}
+
+#5 Unique Binary Search Trees II
+public class Solution {
+    public List<TreeNode> generateTrees(int n) {
+        return helper(1,n);
+    }
+    
+    public List<TreeNode> helper(int start, int end) {
+        List<TreeNode> res = new ArrayList<TreeNode>();
+        if(start>end) {
+            res.add(null);
+            return res;
+        }
+        if(start==end) {
+            res.add(new TreeNode(start));
+            return res;
+        }
+        for(int i=start; i<=end; i++) {
+            List<TreeNode> leftList = helper(start, i-1);
+            List<TreeNode> rightList = helper(i+1, end);
+            for(TreeNode left: leftList) {
+                for(TreeNode right: rightList) {
+                    TreeNode root = new TreeNode(i);
+                    root.left = left;
+                    root.right = right;
+                    res.add(root);
+                }
+            }
+        }
+        return res;
+    }
+}
+
+
+#6 Validate Binary Search Tree
+public class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return helper(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    
+    public boolean helper(TreeNode root, int min, int max) {
+        if(root==null) return true;
+        if(root.val<=min || root.val>=max) return false;
+        return helper(root.left, min, root.val) && helper(root.right, root.val, max);
+    }
+}
+
+
+#7 Recover Binary Search Tree
+//Recursion O(n) space
+public class Solution {
+    TreeNode p,q;
+    TreeNode pre;
+    public void recoverTree(TreeNode root) {
+        findWrong(root);
+        int tmp = p.val;
+        p.val = q.val;
+        q.val = tmp;
+    }
+    
+    public void findWrong(TreeNode root) {
+        if(root==null) return;
+        findWrong(root.left);
+        if(pre!=null && pre.val>root.val) {
+            if(p==null) {
+                p = pre;
+                q = root;
+            } else q = root;
+        }
+        pre = root;
+        findWrong(root.right);
+    }
+}
+
+
+#8 Same Tree
+public class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if(p==null && q==null) return true;
+        if(p==null || q==null) return false;
+        if(p.val!=q.val) return false;
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}
+
+
+#9 Symmetric Tree
+public class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if(root==null) return true;
+        return isSymm(root.left, root.right);
+    }
+    
+    public boolean isSymm(TreeNode p, TreeNode q) {
+        if(p==null && q==null) return true;
+        if(p==null || q==null) return false;
+        if(p.val!=q.val) return false;
+        //p.left is symmetric to q.right, p.right is symmetric to q.left
+        return isSymm(p.left, q.right) && isSymm(p.right, q.left);
+    }
+}
