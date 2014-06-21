@@ -1,0 +1,170 @@
+//[Leetcode]Binary Tree Summary PartIII
+#1 Balanced Binary Tree
+public class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return getHeight(root)!=-1;
+    }
+    
+    public int getHeight(TreeNode root) {
+        if(root==null) return 0;
+        int left = getHeight(root.left);
+        if(left==-1) return -1;
+        int right = getHeight(root.right);
+        if(right==-1) return -1;
+        if(Math.abs(left-right)>1) return -1;
+        else return 1+Math.max(left, right);
+    }
+}
+
+
+#2 Path Sum
+//BFS Method. Two queues
+public class Solution {
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if(root==null) return false;
+        Queue<TreeNode> nodes = new LinkedList<TreeNode>();
+        Queue<Integer> values = new LinkedList<Integer>();
+        nodes.add(root);
+        values.add(root.val);
+        while(!nodes.isEmpty()) {
+            TreeNode n = nodes.poll();
+            int value = values.poll();
+            if(n.left==null && n.right==null && value==sum) return true;
+            if(n.left!=null) {
+                nodes.add(n.left);
+                values.add(value+n.left.val);
+            }
+            if(n.right!=null) {
+                nodes.add(n.right);
+                values.add(value+n.right.val);
+            }
+        }
+        return false;
+    }
+}
+
+
+#3 Path Sum II
+public class Solution {
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        if(root==null) return res;
+        List<Integer> tmp = new ArrayList<Integer>();
+        dfs(res, tmp, root, sum);
+        return res;
+    }
+    
+    public void dfs(List<List<Integer>> res, List<Integer> tmp, TreeNode root, int sum) {
+        if(root==null) return;
+        tmp.add(root.val);
+        if(root.left==null && root.right==null) {
+            if(root.val==sum) res.add(new ArrayList<Integer>(tmp));
+        }
+        dfs(res, tmp, root.left, sum-root.val);
+        dfs(res, tmp, root.right, sum-root.val);
+        tmp.remove(tmp.size()-1);
+    }
+}
+
+
+#4 Flatten Binary Tree to Linked List
+public class Solution {
+    public void flatten(TreeNode root) {
+        if(root==null) return;
+        while(root!=null) {
+            if(root.left==null) root = root.right;
+            else {
+                if(root.right==null) {
+                    root.right = root.left;
+                    root.left = null;
+                    root = root.right;
+                } else {
+                    TreeNode tmp = root.left;
+                    while(tmp.right!=null) tmp = tmp.right;
+                    tmp.right = root.right;
+                    root.right = root.left;
+                    root.left = null;
+                    root = root.right;
+                }
+            }
+        }
+    }
+}
+
+
+#5 Populating Next Rignt Pointers in Each Node
+public class Solution {
+    public void connect(TreeLinkNode root) {
+        if(root==null) return;
+        if(root.left==null && root.right==null) return;
+        root.left.next = root.right;
+        if(root.next!=null) root.right.next = root.next.left;
+        connect(root.left);
+        connect(root.right);
+    }
+}
+
+
+#6 Populating Next Right Pointers in Each Node II
+public class Solution {
+    public void connect(TreeLinkNode root) {
+        if(root==null) return;
+        TreeLinkNode tmp = root.next;
+        TreeLinkNode next = null;
+        while(tmp!=null) {
+            if(tmp.left!=null) {
+                next = tmp.left;
+                break;
+            } else if(tmp.right!=null) {
+                next = tmp.right;
+                break;
+            } else tmp = tmp.next;
+        }
+        if(root.right!=null) {
+            root.right.next = next;
+            if(root.left!=null) root.left.next = root.right;
+        }
+        else if(root.left!=null) root.left.next = next;
+        connect(root.right);
+        connect(root.left);
+    }
+}
+
+
+#7 Binary Tree Maximum Path Sum
+public class Solution {
+    int max = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        if(root==null) return 0;
+        maxPathFromRoot(root);
+        return max;
+    }
+    
+    public int maxPathFromRoot(TreeNode root) {
+        if(root==null) return 0;
+        int left = maxPathFromRoot(root.left);
+        int right = maxPathFromRoot(root.right);
+        int center = Math.max(Math.max(left+root.val, right+root.val), root.val);
+        max = Math.max(max, Math.max(center, left+root.val+right));
+        return center;
+    }
+}
+
+#8 Sum Root to Leaf Numbers
+public class Solution {
+    int sum = 0;
+    public int sumNumbers(TreeNode root) {
+        addPath(root, "");
+        return sum;
+    }
+    
+    public void addPath(TreeNode root, String tmp) {
+        if(root==null) return;
+        if(root.left==null && root.right==null) {
+            sum += Integer.parseInt(tmp+root.val);
+            return;
+        }
+        addPath(root.left, tmp+root.val);
+        addPath(root.right, tmp+root.val);
+    }
+}

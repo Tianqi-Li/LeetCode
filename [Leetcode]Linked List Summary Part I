@@ -1,0 +1,163 @@
+//[Leetcode]Linked List Summary Part I
+#1 Sort List
+public class Solution {
+    public ListNode sortList(ListNode head) {
+        if(head==null || head.next==null) {
+            return head;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast.next!=null && fast.next.next!=null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        fast = slow.next;
+        slow.next = null;
+        slow = head;
+        slow = sortList(slow);
+        fast = sortList(fast);
+        ListNode preHead = new ListNode(-1);
+        ListNode end = preHead;
+        while(slow!=null && fast!=null) {
+            if(slow.val<fast.val) {
+                end.next = slow;
+                slow = slow.next;
+            } else {
+                end.next = fast;
+                fast = fast.next;
+            }
+            end = end.next;
+        }
+        if(slow!=null) end.next = slow;
+        if(fast!=null) end.next = fast;
+        return preHead.next;
+    }
+}
+
+
+#2 Insertion Sort List
+public class Solution {
+    public ListNode insertionSortList(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode run = head;
+        while(run!=null && run.next!=null) {
+            if(run.val<=run.next.val) {
+                run = run.next;
+            } else {
+                ListNode tmp = run.next.next;
+                ListNode t = preHead;
+                while(t.next.val<run.next.val) t = t.next;
+                run.next.next = t.next;
+                t.next = run.next;
+                run.next = tmp;
+            }
+        }
+        return preHead.next;
+    }
+}
+
+
+#3 Reorder List
+public class Solution {
+    public void reorderList(ListNode head) {
+        if(head==null || head.next==null) return;
+        ListNode fast = head;
+        ListNode slow = head;
+        while(fast.next!=null && fast.next.next!=null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        fast = reverse(slow.next);
+        slow.next = null;
+        slow = head;
+        while(fast!=null) {
+            ListNode tmp = fast.next;
+            fast.next = slow.next;
+            slow.next = fast;
+            slow = slow.next.next;
+            fast = tmp;
+        }
+    }
+    
+    public ListNode reverse(ListNode head) {
+        if(head==null) return null;
+        ListNode start = head;
+        ListNode run = head.next;
+        while(run!=null) {
+            ListNode tmp = run.next;
+            run.next = start;
+            start = run;
+            run = tmp;
+        }
+        head.next = null;
+        return start;
+    }
+}
+
+
+#4 Linked List Cycle
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if(head==null || head.next==null) return false;
+        ListNode fast = head;
+        ListNode slow = head;
+        while(fast!=null && fast.next!=null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if(fast==slow) return true;
+        }
+        return false;
+    }
+}
+
+#5 Linked List Cycle II
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        if(head==null) return null;
+        ListNode fast = head;
+        ListNode slow = head;
+        while(fast!=null && fast.next!=null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if(fast==slow) {
+                fast = head;
+                while(fast!=slow) {
+                    fast = fast.next;
+                    slow = slow.next;
+                }
+                return fast;
+            }
+        }
+        return null;
+    }
+}
+
+
+#6 Copy List with Random Pointer
+public class Solution {
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if(head==null) return null;
+        RandomListNode run = head;
+        while(run!=null) {
+            RandomListNode n = new RandomListNode(run.label);
+            n.next = run.next;
+            run.next = n;
+            run = n.next;
+        }
+        run = head;
+        while(run!=null) {
+            if(run.random!=null) run.next.random = run.random.next;
+            run = run.next.next;
+        }
+        run = head;
+        RandomListNode copyHead = head.next;
+        while(run!=null && run.next!=null) {
+            RandomListNode tmp = run.next;
+            run.next = tmp.next;
+            run = tmp;
+        }
+        return copyHead;
+    }
+}

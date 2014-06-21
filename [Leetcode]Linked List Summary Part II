@@ -1,0 +1,258 @@
+//[Leetcode]Linked List Summary Part II
+#1 Remove Nth Node From End of List
+public class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode fast = preHead;
+        ListNode slow = preHead;
+        for(int i=0; i<n-1; i++) fast = fast.next;
+        while(fast.next!=null && fast.next.next!=null) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        slow.next = slow.next.next;
+        return preHead.next;
+    }
+}
+
+#2 Merge K Sorted Lists
+//Time O(nlogn), space O(n)
+public class Solution {
+    public ListNode mergeKLists(List<ListNode> lists) {
+        if(lists.size()==0) return null;
+        ListNode preHead = new ListNode(-1);
+        ListNode end = preHead;
+        PriorityQueue<ListNode> q = new PriorityQueue<ListNode>(lists.size(), new Comparator<ListNode>() {
+            public int compare(ListNode n1, ListNode n2) {
+                if(n1.val<n2.val) return -1;
+                else if(n1.val==n2.val) return 0;
+                else return 1;
+            }
+        });
+        for(ListNode n: lists) {
+            if(n!=null) q.add(n);
+        }
+        while(!q.isEmpty()) {
+            ListNode n = q.poll();
+            end.next = n;
+            end = end.next;
+            if(n.next!=null) q.add(n.next);
+        }
+        return preHead.next;
+    }
+}
+
+
+#3 Swap Nodes in Pairs
+public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if(head==null) return null;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode run = head;
+        ListNode end = preHead;
+        while(run!=null && run.next!=null) {
+            ListNode tmp = run.next.next;
+            end.next = run.next;
+            run.next = run.next.next;
+            end.next.next = run;
+            end = run;
+            run = tmp;
+        }
+        return preHead.next;
+    }
+}
+
+
+#4 Reverse Nodes in k-Group
+public class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if(head==null || k==1) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode run = head;
+        ListNode start = preHead;
+        int i = 1;
+        while(run!=null) {
+            if(i%k==0) {
+                start = reverse(start, run.next);
+                run = start.next;
+            } else run = run.next;
+            i++;
+        }
+        return preHead.next;
+    }
+    
+    public ListNode reverse(ListNode n1, ListNode n2) {
+        ListNode head = n1.next;
+        ListNode start = head;
+        ListNode run = head.next;
+        while(run!=null && run!=n2) {
+            ListNode tmp = run.next;
+            run.next = start;
+            start = run;
+            run = tmp;
+        }
+        n1.next = start;
+        head.next = n2;
+        return head;
+    }
+}
+
+
+#5 Rotate List
+public class Solution {
+    public ListNode rotateRight(ListNode head, int n) {
+        if(head==null || n==0) return head;
+        int size = 1;
+        ListNode end = head;
+        while(end!=null && end.next!=null) {
+            end = end.next;
+            size++;
+        }
+        //left rotate by n nodes
+        n = size - n%size;
+        ListNode run = head;
+        for(int i=0; i<n; i++) {
+            end.next = run;
+            run = run.next;
+            end = end.next;
+        }
+        end.next = null;
+        return run;
+    }
+}
+
+
+#6 Merge Two Sorted Lists
+public class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if(l1==null && l2==null) return null;
+        if(l1==null) return l2;
+        if(l2==null) return l1;
+        ListNode preHead = new ListNode(-1);
+        ListNode end = preHead;
+        while(l1!=null && l2!=null) {
+            if(l1.val<l2.val) {
+                end.next = l1;
+                l1 = l1.next;
+            } else {
+                end.next = l2;
+                l2 = l2.next;
+            }
+            end = end.next;
+        }
+        if(l1==null) end.next = l2;
+        if(l2==null) end.next = l1;
+        return preHead.next;
+    }
+}
+
+
+#7 Remove Duplicates from Sorted List
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null) return null;
+        ListNode run = head.next;
+        ListNode end = head;
+        while(run!=null) {
+            if(run.val==end.val) {
+                end.next = run.next;
+                run = run.next;
+            } else {
+                end = run;
+                run = run.next;
+            }
+        }
+        return head;
+    }
+}
+
+#8 Remove Duplicates from Sorted List II
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null || head.next==null) return head;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode end = preHead;
+        ListNode run = head;
+        while(run!=null && run.next!=null) {
+            if(run.val==run.next.val) {
+                while(run.next!=null && run.val==run.next.val) run = run.next;
+                end.next = run.next;
+                run = run.next;
+            } else {
+                end = run;
+                run = run.next;
+            }
+        }
+        return preHead.next;
+    }
+}
+
+
+#9 Partition List
+public class Solution {
+    public ListNode partition(ListNode head, int x) {
+        if(head==null) return null;
+        ListNode firstStart=null, firstEnd=null;
+        ListNode secondStart=null, secondEnd=null;
+        ListNode run = head;
+        while(run!=null) {
+            ListNode tmp = run.next;
+            //Remember to set run.next to null
+            run.next = null;
+            if(run.val<x) {
+                if(firstStart==null) {
+                    firstStart = run;
+                    firstEnd = run;
+                } else {
+                    firstEnd.next = run;
+                    firstEnd = firstEnd.next;
+                }
+            } else {
+                if(secondStart==null) {
+                    secondStart = run;
+                    secondEnd = run;
+                } else {
+                    secondEnd.next = run;
+                    secondEnd = secondEnd.next;
+                }
+            }
+            run = tmp;
+        }
+        if(firstStart==null) return secondStart;
+        firstEnd.next = secondStart;
+        return firstStart;
+    }
+}
+
+
+#10 Reverse Linked List II
+public class Solution {
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        if(head==null) return null;
+        ListNode preHead = new ListNode(-1);
+        preHead.next = head;
+        ListNode n1 = preHead;
+        ListNode n2 = preHead;
+        for(int i=0; i<n-m+2; i++) n2 = n2.next;
+        for(int i=0; i<m-1; i++) {
+            n1 = n1.next;
+            n2 = n2.next;
+        }
+        head = n1.next;
+        ListNode start = head;
+        ListNode run = head.next;
+        while(run!=n2) {
+            ListNode tmp = run.next;
+            run.next = start;
+            start = run;
+            run = tmp;
+        }
+        head.next = n2;
+        n1.next = start;
+        return preHead.next;
+    }
+}
