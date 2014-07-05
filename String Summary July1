@@ -1,0 +1,182 @@
+//String Summary July1
+//[Leetcode]Evaluate Reverse Polish Notation
+//A more efficient way
+public class Solution {
+    public int evalRPN(String[] tokens) {
+        if(tokens.length==0) return 0;
+        Stack<Integer> stack = new Stack<Integer>();
+        String operators = "+-*/";
+        for(int i=0; i<tokens.length; i++) {
+            String str = tokens[i];
+            if(!operators.contains(str)) {
+                stack.push(Integer.parseInt(str));
+            } else {
+                int a = stack.pop();
+                int b = stack.pop();
+                int index = operators.indexOf(str);
+                switch(index) {
+                    case 0: stack.push(a+b);
+                              break;
+                    case 1: stack.push(b-a);
+                              break;
+                    case 2: stack.push(a*b);
+                              break;
+                    case 3: stack.push(b/a);
+                              break;
+                }
+            }
+        }
+        return stack.pop();
+    }
+}
+
+//[Leetcode]Longest Palindrome Substring
+public class Solution {
+    public String longestPalindrome(String s) {
+        if(s==null || s.length()==0) return "";
+        String max = "";
+        for(int i=0; i<s.length(); i++) {
+            //odd case
+            String s1 = findPalindrome(s,i,i);
+            if(s1.length()>max.length()) {
+                max = s1;
+            }
+            //even case
+            String s2 = findPalindrome(s,i,i+1);
+            if(s2.length()>max.length()) {
+                max = s2;
+            }
+        }
+        return max;
+    }
+    
+    public String findPalindrome(String s, int start, int end) {
+        while(start>=0 && end<s.length() && s.charAt(start)==s.charAt(end)) {
+            start--;
+            end++;
+        }
+        return s.substring(start+1, end);
+    }
+}
+
+
+//[Leetcode]Word Break
+public class Solution {
+    public boolean wordBreak(String s, Set<String> dict) {
+        if(s.length()==0 || dict.size()==0) return false;
+        int len = s.length();
+        boolean[] dp = new boolean[len];
+        for(int i=0; i<len; i++) {
+            if(dict.contains(s.substring(0,i+1))) dp[i]=true;
+            else {
+                for(int j=i; j>=0; j--) {
+                    if(dp[j] && dict.contains(s.substring(j+1,i+1))) {
+                        dp[i] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return dp[len-1];
+    }
+}
+
+
+//[Leetcode]Regular Expression Matching
+public class Solution {
+    public boolean isMatch(String s, String p) {
+        if(p.length()==0) return s.length()==0;
+        if(p.length()==1 || p.charAt(1)!='*') {
+            if(s.length()<1 || (p.charAt(0)!='.' && s.charAt(0)!=p.charAt(0))) {
+                return false;
+            }
+            return isMatch(s.substring(1), p.substring(1));
+        } else {
+            int i = -1;
+            while(i<s.length() && (i<0 || p.charAt(0)=='.' || p.charAt(0)==s.charAt(i))) {
+                if(isMatch(s.substring(i+1), p.substring(2))) return true;
+                i++;
+            }
+            return false;
+        }
+    }
+}
+
+
+//[Leetcode]String to Integer (atoi)
+public class Solution {
+    public int atoi(String str) {
+        if(str==null || str.length()==0) return 0;
+        //Trim the white spaces at the front and end of the string
+        str = str.trim();
+        boolean positive = true;
+        long res = 0;
+        int i=0;
+        if(str.charAt(0)=='-' || str.charAt(0)=='+') {
+            positive = str.charAt(0)=='+';
+            i++;
+        }
+        while(i<str.length() && str.charAt(i)>='0' && str.charAt(i)<='9') {
+            int value = str.charAt(i) - '0';
+            res = res*10 + value;
+            i++;
+        }
+        if(!positive) res = -res;
+        if(res>Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if(res<Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        return (int)res;
+    }
+}
+
+
+//[Leetcode]Longest Consecutive Sequence
+public class Solution {
+    public int longestConsecutive(int[] num) {
+        if(num.length==0) return 0;
+        Set<Integer> set = new HashSet<Integer>();
+        for(int i: num) set.add(i);
+        int max = 1;
+        for(int n: num) {
+            int left = n-1;
+            int right = n+1;
+            int count = 1;
+            while(set.contains(left)) {
+                count++;
+                set.remove(left);
+                left--;
+            }
+            while(set.contains(right)) {
+                count++;
+                set.remove(right);
+                right++;
+            }
+            max = Math.max(max, count);
+        }
+        return max;
+    }
+}
+
+
+//[Leetcode]Longest Substring Without Repeating Characters
+public class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s.length()==0) return 0;
+        boolean[] dict = new boolean[256];
+        int start=0;
+        int max = 1;
+        for(int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if(!dict[c]) dict[c] = true;
+            else {
+                max = Math.max(max, i-start);
+                int j = start;
+                while(j<i && s.charAt(j)!=c) {
+                    dict[s.charAt(j)] = false;
+                    j++;
+                }
+                start = j+1;
+            }
+        }
+        return Math.max(max,s.length()-start);
+    }
+}
